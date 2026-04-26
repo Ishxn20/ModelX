@@ -6,6 +6,7 @@ from api.routes import router
 from api.training_simulation import router as training_simulation_router
 from api.inference import router as inference_router
 from api.ship import router as ship_router
+from api.gemma import router as gemma_router
 from api.sse import sse_manager
 from api.sse_test import create_test_sse_endpoint
 import logging
@@ -35,6 +36,7 @@ app.include_router(router, prefix="/api")
 app.include_router(training_simulation_router)
 app.include_router(inference_router)
 app.include_router(ship_router)
+app.include_router(gemma_router)
 
 
 @app.options("/api/inference/chat")

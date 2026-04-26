@@ -7,12 +7,15 @@ import {
   LinearProgress,
   Alert,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import DownloadIcon from '@mui/icons-material/Download';
 import NotebookIcon from '@mui/icons-material/MenuBook';
 import CodeIcon from '@mui/icons-material/Code';
 import FolderZipIcon from '@mui/icons-material/FolderZip';
 
-interface ShipItPanelProps {
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+interface DeployPanelProps {
   taskType: string;
   modelId: string;
   datasetName: string;
@@ -45,33 +48,33 @@ const OPTIONS: ShipOption[] = [
   {
     key: 'model',
     icon: <CodeIcon sx={{ fontSize: '1.5rem' }} />,
-    title: 'Model Weights',
-    subtitle: 'Download .pt',
+    title: 'Model Config',
+    subtitle: 'Download .json',
     description:
-      'A PyTorch .pt file containing the model architecture and randomised weights — load it directly with torch.load() and swap in your real fine-tuned weights.',
-    endpoint: '/api/ship/model',
-    filename: (s) => `${s}_model.pt`,
-    mimeType: 'application/octet-stream',
+      'A deploy-ready configuration manifest with task type, model, dataset, metrics, and starter serving settings.',
+    endpoint: '/api/deploy/model',
+    filename: (s) => `${s}_model_config.json`,
+    mimeType: 'application/json',
   },
   {
     key: 'notebook',
     icon: <NotebookIcon sx={{ fontSize: '1.5rem' }} />,
-    title: 'Jupyter Notebook',
+    title: 'Training Notebook',
     subtitle: 'Download .ipynb',
     description:
-      'A complete end-to-end training notebook covering dataset loading, preprocessing, fine-tuning with the HuggingFace Trainer API, evaluation, and model saving — 100% runnable.',
-    endpoint: '/api/ship/notebook',
+      'A complete starter notebook covering setup, dataset loading, preprocessing, training, evaluation, and saving.',
+    endpoint: '/api/deploy/notebook',
     filename: (s) => `${s}_training.ipynb`,
     mimeType: 'application/json',
   },
   {
     key: 'repo',
     icon: <FolderZipIcon sx={{ fontSize: '1.5rem' }} />,
-    title: 'GitHub Repository',
+    title: 'Deploy Repository',
     subtitle: 'Download .zip',
     description:
-      'A fully-structured repository ZIP with README, requirements.txt, config.yaml, and separate src/ modules for dataset loading, model setup, training, and evaluation.',
-    endpoint: '/api/ship/repo',
+      'A structured repository ZIP with README, config, training, evaluation, inference, and a minimal serving API.',
+    endpoint: '/api/deploy/repo',
     filename: (s) => `${s}.zip`,
     mimeType: 'application/zip',
   },
@@ -85,7 +88,7 @@ const slugify = (text: string) =>
     .slice(0, 40) || 'ml-project';
 
 const LOADING_MESSAGES: Record<OptionKey, string[]> = {
-  model: ['Initialising model architecture…', 'Generating random weights…', 'Serialising .pt file…'],
+  model: ['Preparing model manifest…', 'Adding deployment settings…', 'Serialising config…'],
   notebook: [
     'Writing your notebook…',
     'Building training cells…',
@@ -93,7 +96,7 @@ const LOADING_MESSAGES: Record<OptionKey, string[]> = {
     'Finalising notebook JSON…',
   ],
   repo: [
-    'Architecting your repository…',
+    'Creating deploy repository…',
     'Writing dataset module…',
     'Writing training script…',
     'Writing evaluation script…',
@@ -101,7 +104,7 @@ const LOADING_MESSAGES: Record<OptionKey, string[]> = {
   ],
 };
 
-export default function ShipItPanel({
+export default function DeployPanel({
   taskType,
   modelId,
   datasetName,
@@ -115,7 +118,9 @@ export default function ShipItPanel({
   nextSteps = [],
   whyThisPair = '',
   estimatedEffort = '',
-}: ShipItPanelProps) {
+}: DeployPanelProps) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const [loading, setLoading] = useState<OptionKey | null>(null);
   const [loadingMsg, setLoadingMsg] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -150,7 +155,7 @@ export default function ShipItPanel({
     }, 2800);
 
     try {
-      const resp = await fetch(`http://localhost:8000${option.endpoint}`, {
+      const resp = await fetch(`${API_URL}${option.endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
@@ -201,24 +206,38 @@ export default function ShipItPanel({
               key={option.key}
               sx={{
                 border: '1px solid',
-                borderColor: isLoading ? 'rgba(194, 181, 232, 0.40)' : 'rgba(244, 240, 232, 0.08)',
+                borderColor: isLoading
+                  ? 'rgba(157, 141, 208, 0.42)'
+                  : isDark ? 'rgba(244, 240, 232, 0.08)' : 'rgba(24, 22, 15, 0.08)',
                 borderRadius: 2.5,
                 p: 2.5,
                 background: isLoading
-                  ? 'linear-gradient(135deg, rgba(31, 35, 44, 0.95) 0%, rgba(39, 44, 55, 0.95) 100%)'
-                  : 'linear-gradient(180deg, rgba(23, 26, 34, 0.85) 0%, rgba(16, 18, 24, 0.88) 100%)',
+                  ? isDark
+                    ? 'linear-gradient(135deg, rgba(31, 35, 44, 0.95) 0%, rgba(39, 44, 55, 0.95) 100%)'
+                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(242, 239, 232, 0.98) 100%)'
+                  : isDark
+                    ? 'linear-gradient(180deg, rgba(23, 26, 34, 0.85) 0%, rgba(16, 18, 24, 0.88) 100%)'
+                    : 'linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 247, 244, 0.98) 100%)',
                 backdropFilter: 'blur(24px)',
                 boxShadow: isLoading
-                  ? '0 1px 0 rgba(244, 240, 232, 0.06) inset, 0 16px 40px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(194, 181, 232, 0.12)'
-                  : '0 1px 0 rgba(244, 240, 232, 0.04) inset, 0 12px 32px rgba(0, 0, 0, 0.32)',
+                  ? isDark
+                    ? '0 1px 0 rgba(244, 240, 232, 0.06) inset, 0 16px 40px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(194, 181, 232, 0.12)'
+                    : '0 1px 0 rgba(255, 255, 255, 0.92) inset, 0 14px 30px rgba(24, 22, 15, 0.10), 0 0 0 1px rgba(157, 141, 208, 0.10)'
+                  : isDark
+                    ? '0 1px 0 rgba(244, 240, 232, 0.04) inset, 0 12px 32px rgba(0, 0, 0, 0.32)'
+                    : '0 1px 0 rgba(255, 255, 255, 0.92) inset, 0 12px 28px rgba(24, 22, 15, 0.08)',
                 transition: 'all 350ms cubic-bezier(0.16, 1, 0.3, 1)',
                 opacity: isDisabled ? 0.4 : 1,
                 position: 'relative',
                 overflow: 'hidden',
                 '&:hover': isDisabled || isLoading ? undefined : {
-                  background: 'linear-gradient(180deg, rgba(31, 35, 44, 0.90) 0%, rgba(23, 26, 34, 0.92) 100%)',
-                  borderColor: 'rgba(194, 181, 232, 0.20)',
-                  boxShadow: '0 1px 0 rgba(244, 240, 232, 0.06) inset, 0 16px 40px rgba(0, 0, 0, 0.40), 0 0 0 1px rgba(194, 181, 232, 0.08)',
+                  background: isDark
+                    ? 'linear-gradient(180deg, rgba(31, 35, 44, 0.90) 0%, rgba(23, 26, 34, 0.92) 100%)'
+                    : 'linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(242, 239, 232, 0.98) 100%)',
+                  borderColor: 'rgba(157, 141, 208, 0.24)',
+                  boxShadow: isDark
+                    ? '0 1px 0 rgba(244, 240, 232, 0.06) inset, 0 16px 40px rgba(0, 0, 0, 0.40), 0 0 0 1px rgba(194, 181, 232, 0.08)'
+                    : '0 1px 0 rgba(255, 255, 255, 0.94) inset, 0 16px 34px rgba(24, 22, 15, 0.10), 0 0 0 1px rgba(157, 141, 208, 0.08)',
                   transform: 'translateY(-2px)',
                 },
               }}
@@ -232,7 +251,7 @@ export default function ShipItPanel({
                     right: 0,
                     height: 2,
                     borderRadius: 0,
-                    bgcolor: 'rgba(244, 240, 232, 0.06)',
+                    bgcolor: isDark ? 'rgba(244, 240, 232, 0.06)' : 'rgba(24, 22, 15, 0.06)',
                     '& .MuiLinearProgress-bar': {
                       background: 'linear-gradient(90deg, #C2B5E8 0%, #E5B5A0 100%)',
                       boxShadow: '0 0 12px rgba(194, 181, 232, 0.45)',
@@ -250,9 +269,11 @@ export default function ShipItPanel({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    background: 'linear-gradient(135deg, rgba(194, 181, 232, 0.18) 0%, rgba(157, 141, 208, 0.10) 100%)',
-                    border: '1px solid rgba(194, 181, 232, 0.22)',
-                    color: '#C2B5E8',
+                    background: isDark
+                      ? 'linear-gradient(135deg, rgba(194, 181, 232, 0.18) 0%, rgba(157, 141, 208, 0.10) 100%)'
+                      : 'linear-gradient(135deg, rgba(157, 141, 208, 0.18) 0%, rgba(194, 181, 232, 0.22) 100%)',
+                    border: isDark ? '1px solid rgba(194, 181, 232, 0.22)' : '1px solid rgba(157, 141, 208, 0.24)',
+                    color: isDark ? '#C2B5E8' : '#6F5CB6',
                     flexShrink: 0,
                     transition: 'all 350ms cubic-bezier(0.16, 1, 0.3, 1)',
                   }}
@@ -311,8 +332,8 @@ export default function ShipItPanel({
                       ...(isLoading
                         ? {
                             borderColor: 'rgba(194, 181, 232, 0.40)',
-                            color: '#C2B5E8',
-                            background: 'rgba(194, 181, 232, 0.06)',
+                            color: isDark ? '#C2B5E8' : '#6F5CB6',
+                            background: isDark ? 'rgba(194, 181, 232, 0.06)' : 'rgba(157, 141, 208, 0.08)',
                           }
                         : {
                             background: 'linear-gradient(135deg, #C2B5E8 0%, #9D8DD0 100%)',
@@ -326,7 +347,7 @@ export default function ShipItPanel({
                           }),
                     }}
                   >
-                    {isLoading ? 'Generating…' : `Download ${option.subtitle}`}
+                    {isLoading ? 'Generating…' : option.subtitle}
                   </Button>
                 </Box>
               </Stack>
@@ -339,7 +360,7 @@ export default function ShipItPanel({
         variant="caption"
         sx={{ display: 'block', mt: 2.5, color: 'text.disabled', textAlign: 'center', lineHeight: 1.6 }}
       >
-        Generated code is grounded in your blueprint. Review before production use.
+        Deployment artifacts are grounded in your blueprint. Review before production use.
       </Typography>
     </Box>
   );

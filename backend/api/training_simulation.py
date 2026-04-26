@@ -1,6 +1,7 @@
 import asyncio
 import json
 import random
+import re
 import time
 from typing import Any, AsyncGenerator, Dict, List, Literal, Optional
 
@@ -790,6 +791,52 @@ class ExecutionConfig(BaseModel):
     ]
     model_id: Optional[str] = ""
     dataset_name: Optional[str] = ""
+    training_plan: Optional[str] = ""
+
+
+def _split_label_from_training_plan(training_plan: Optional[str]) -> str:
+    text = (training_plan or "").lower()
+    if not text:
+        return "train / val  80 · 20 split"
+
+    compact = re.sub(r"\s+", " ", text)
+
+    ratio_match = re.search(
+        r"(?:train|training)[^0-9]{0,40}(\d{1,3})\s*(?:/|:|·|-)\s*(\d{1,3})(?:\s*(?:/|:|·|-)\s*(\d{1,3}))?\s*(?:split|train|training|val|validation|test)?",
+        compact,
+    )
+    if ratio_match:
+        parts = [int(p) for p in ratio_match.groups() if p]
+        if len(parts) == 3 and sum(parts) <= 100:
+            return f"train / val / test  {parts[0]} · {parts[1]} · {parts[2]} split"
+        if len(parts) == 2 and sum(parts) <= 100:
+            return f"train / val  {parts[0]} · {parts[1]} split"
+
+    def pct_after(labels: List[str]) -> Optional[int]:
+        pattern = r"(?:%s)[^0-9]{0,30}(\d{1,3})(?:\s*%%|\s*percent)?" % "|".join(labels)
+        match = re.search(pattern, compact)
+        if not match:
+            return None
+        value = int(match.group(1))
+        return value if 0 < value < 100 else None
+
+    train = pct_after(["train", "training"])
+    val = pct_after(["val", "validation", "valid"])
+    test = pct_after(["test", "testing"])
+
+    if train and val and test:
+        return f"train / val / test  {train} · {val} · {test} split"
+    if train and val:
+        return f"train / val  {train} · {val} split"
+
+    mentions_test = "test" in compact or "held-out" in compact
+    mentions_val = "val" in compact or "validation" in compact
+    if mentions_val and mentions_test:
+        return "train / val / test split"
+    if mentions_val:
+        return "train / val split"
+
+    return "train / val  80 · 20 split"
 
 
 def train_and_evaluate_local_model(task_type: str) -> Dict[str, float]:
@@ -968,10 +1015,11 @@ async def sse_training_generator(session_id: str, config: ExecutionConfig) -> As
     dataset_label = (config.dataset_name or "").strip()
     if not dataset_label:
         dataset_label = "proxy dataset"
+    split_label = _split_label_from_training_plan(config.training_plan)
 
     for msg in [
         "Initializing training environment",
-        f"Loading  {dataset_label}  (train / val  80 · 20 split)",
+        f"Loading  {dataset_label}  ({split_label})",
         "Applying preprocessing pipeline",
         f"Compiling {custom_arch['name']} model graph",
     ]:

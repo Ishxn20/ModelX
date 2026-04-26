@@ -14,7 +14,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import type { Agent, Phase, ProjectData } from '../lib/types';
+import type { Agent, MLBlueprint, Phase, ProjectData } from '../lib/types';
 import { useSimulation } from '../hooks/useSimulation';
 import PhaseIndicator from './PhaseIndicator';
 import MLBlueprintPanel from './MLBlueprintPanel';
@@ -30,6 +30,7 @@ interface DebateViewerProps {
   sessionId: string;
   projectData: ProjectData;
   onReset: () => void;
+  onBlueprintReady?: (blueprint: MLBlueprint) => void;
 }
 
 const allAgents: Agent[] = [
@@ -58,7 +59,7 @@ const phaseAgentMap: Partial<Record<Phase, string[]>> = {
   blueprint: ['modelx_guide'],
 };
 
-const DebateViewer: React.FC<DebateViewerProps> = ({ sessionId, projectData, onReset }) => {
+const DebateViewer: React.FC<DebateViewerProps> = ({ sessionId, projectData, onReset, onBlueprintReady }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const useSSE = import.meta.env.VITE_USE_SSE === 'true';
@@ -82,8 +83,9 @@ const DebateViewer: React.FC<DebateViewerProps> = ({ sessionId, projectData, onR
   useEffect(() => {
     if (blueprint) {
       setActiveTab('blueprint');
+      onBlueprintReady?.(blueprint);
     }
-  }, [blueprint]);
+  }, [blueprint, onBlueprintReady]);
 
   const getActiveAgents = (): string[] => phaseAgentMap[phase] || [];
 
@@ -267,8 +269,8 @@ const DebateViewer: React.FC<DebateViewerProps> = ({ sessionId, projectData, onR
                           width: 14,
                           height: 14,
                           borderRadius: '50%',
-                          background: isActive ? '#A8D4C5' : isComplete ? '#C2B5E8' : '#3A3F4B',
-                          border: '2px solid #171A22',
+                          background: isActive ? '#A8D4C5' : isComplete ? '#C2B5E8' : isDark ? '#3A3F4B' : '#D8D2C8',
+                          border: isDark ? '2px solid #171A22' : '2px solid #FFFFFF',
                           zIndex: 10,
                           boxShadow: isActive ? '0 0 8px rgba(168, 212, 197, 0.6)' : 'none',
                         }}
@@ -332,7 +334,7 @@ const DebateViewer: React.FC<DebateViewerProps> = ({ sessionId, projectData, onR
       {isRunning && !blueprint && <LinearProgress sx={{ mb: 2, height: 4, borderRadius: 2 }} />}
 
       {blueprint && (
-        <Box sx={{ mb: 2, borderBottom: '1px solid rgba(244, 240, 232, 0.06)' }}>
+        <Box sx={{ mb: 2, borderBottom: isDark ? '1px solid rgba(244, 240, 232, 0.06)' : '1px solid rgba(24, 22, 15, 0.08)' }}>
           <Tabs
             value={activeTab}
             onChange={(_, newValue) => setActiveTab(newValue)}
@@ -365,12 +367,16 @@ const DebateViewer: React.FC<DebateViewerProps> = ({ sessionId, projectData, onR
       {activeTab === 'activity' && (
         <Box
           sx={{
-            background: 'linear-gradient(180deg, rgba(23, 26, 34, 0.85) 0%, rgba(16, 18, 24, 0.88) 100%)',
+            background: isDark
+              ? 'linear-gradient(180deg, rgba(23, 26, 34, 0.85) 0%, rgba(16, 18, 24, 0.88) 100%)'
+              : 'linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 245, 241, 0.98) 100%)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
-            border: '1px solid rgba(244, 240, 232, 0.06)',
+            border: isDark ? '1px solid rgba(244, 240, 232, 0.06)' : '1px solid rgba(24, 22, 15, 0.08)',
             borderRadius: 2.5,
-            boxShadow: '0 1px 0 rgba(244, 240, 232, 0.03) inset, 0 16px 48px rgba(0, 0, 0, 0.36)',
+            boxShadow: isDark
+              ? '0 1px 0 rgba(244, 240, 232, 0.03) inset, 0 16px 48px rgba(0, 0, 0, 0.36)'
+              : '0 1px 0 rgba(255, 255, 255, 0.92) inset, 0 16px 40px rgba(24, 22, 15, 0.10)',
             height: { xs: 'calc(100vh - 340px)', sm: 'calc(100vh - 300px)', md: 'calc(100vh - 280px)' },
             minHeight: 580,
             overflow: 'hidden',

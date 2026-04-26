@@ -9,6 +9,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
@@ -609,6 +610,8 @@ function TransformStrip({ tf }: { tf: TransformInfo }) {
 }
 
 function LayerBlock({ layer }: { layer: ArchitectureLayer }) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const family = classifyLayer(layer);
   const pal = FAMILY_PALETTE[family];
   const transforms = extractTransforms(layer);
@@ -654,12 +657,18 @@ function LayerBlock({ layer }: { layer: ArchitectureLayer }) {
         sx={{
           p: 1.75,
           borderRadius: '10px',
-          background: `linear-gradient(180deg, ${pal.bg} 0%, rgba(23,26,34,0.85) 100%)`,
+          background: isDark
+            ? `linear-gradient(180deg, ${pal.bg} 0%, rgba(23,26,34,0.85) 100%)`
+            : `linear-gradient(180deg, ${pal.bg} 0%, rgba(255,255,255,0.94) 100%)`,
           border: `1px solid ${pal.border}`,
-          boxShadow: `inset 0 1px 0 rgba(244,240,232,0.06), inset 0 -1px 0 rgba(0,0,0,0.32), 0 4px 12px rgba(0,0,0,0.24)`,
+          boxShadow: isDark
+            ? `inset 0 1px 0 rgba(244,240,232,0.06), inset 0 -1px 0 rgba(0,0,0,0.32), 0 4px 12px rgba(0,0,0,0.24)`
+            : `inset 0 1px 0 rgba(255,255,255,0.86), 0 4px 12px rgba(24,22,15,0.08)`,
           transition: 'box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
           '&:hover': {
-            boxShadow: `inset 0 1px 0 rgba(244,240,232,0.10), 0 0 24px 3px ${pal.accent}30, 0 6px 18px rgba(0,0,0,0.36)`,
+            boxShadow: isDark
+              ? `inset 0 1px 0 rgba(244,240,232,0.10), 0 0 24px 3px ${pal.accent}30, 0 6px 18px rgba(0,0,0,0.36)`
+              : `inset 0 1px 0 rgba(255,255,255,0.92), 0 0 20px 2px ${pal.accent}22, 0 6px 18px rgba(24,22,15,0.10)`,
             borderColor: `${pal.accent}70`,
             transform: 'translateY(-1px)',
           },
@@ -779,6 +788,8 @@ function MetricBar({
   value: number;
   compareValue: number;
 }) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const lowerIsBetter = LOWER_IS_BETTER.has(name);
   const maxVal = Math.max(Math.abs(value), Math.abs(compareValue), 0.001);
   const fillPct = lowerIsBetter
@@ -817,12 +828,12 @@ function MetricBar({
         sx={{
           height: 6,
           borderRadius: 4,
-          backgroundColor: 'rgba(244,240,232,0.06)',
+          backgroundColor: isDark ? 'rgba(244,240,232,0.06)' : 'rgba(24,22,15,0.08)',
           '& .MuiLinearProgress-bar': {
             borderRadius: 4,
             background: isWinner
               ? `linear-gradient(90deg, ${clrMint} 0%, #7FBAA8 100%)`
-              : 'linear-gradient(90deg, #4A4640 0%, #76716A 100%)',
+              : isDark ? 'linear-gradient(90deg, #4A4640 0%, #76716A 100%)' : 'linear-gradient(90deg, #D8D2C8 0%, #AFA79C 100%)',
             boxShadow: isWinner ? `0 0 8px rgba(168,212,197,0.40)` : 'none',
           },
         }}
@@ -842,19 +853,31 @@ function ModelCard({
   isWinner: boolean;
   label: string;
 }) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   return (
     <Box
       sx={{
         width: '100%',
         p: 2.5,
         borderRadius: 2.5,
-        border: isWinner ? `1.5px solid rgba(168,212,197,0.45)` : '1px solid rgba(244,240,232,0.08)',
+        border: isWinner
+          ? `1.5px solid rgba(168,212,197,0.45)`
+          : isDark ? '1px solid rgba(244,240,232,0.08)' : '1px solid rgba(24,22,15,0.08)',
         background: isWinner
-          ? `linear-gradient(180deg, rgba(168,212,197,0.06) 0%, rgba(23,26,34,0.85) 100%)`
-          : 'linear-gradient(180deg, rgba(31,35,44,0.85) 0%, rgba(23,26,34,0.85) 100%)',
+          ? isDark
+            ? `linear-gradient(180deg, rgba(168,212,197,0.06) 0%, rgba(23,26,34,0.85) 100%)`
+            : `linear-gradient(180deg, rgba(168,212,197,0.16) 0%, rgba(255,255,255,0.96) 100%)`
+          : isDark
+            ? 'linear-gradient(180deg, rgba(31,35,44,0.85) 0%, rgba(23,26,34,0.85) 100%)'
+            : 'linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(246,245,241,0.98) 100%)',
         boxShadow: isWinner
-          ? `0 0 0 1px rgba(168,212,197,0.18) inset, 0 16px 40px rgba(0,0,0,0.32), 0 0 32px rgba(168,212,197,0.12)`
-          : '0 1px 0 rgba(244,240,232,0.04) inset, 0 12px 32px rgba(0,0,0,0.28)',
+          ? isDark
+            ? `0 0 0 1px rgba(168,212,197,0.18) inset, 0 16px 40px rgba(0,0,0,0.32), 0 0 32px rgba(168,212,197,0.12)`
+            : `0 0 0 1px rgba(168,212,197,0.18) inset, 0 16px 34px rgba(24,22,15,0.10), 0 0 28px rgba(168,212,197,0.10)`
+          : isDark
+            ? '0 1px 0 rgba(244,240,232,0.04) inset, 0 12px 32px rgba(0,0,0,0.28)'
+            : '0 1px 0 rgba(255,255,255,0.92) inset, 0 12px 28px rgba(24,22,15,0.08)',
         position: 'relative',
       }}
     >
@@ -922,7 +945,7 @@ function ModelCard({
         ))}
       </Box>
 
-      <Divider sx={{ borderColor: 'rgba(255,255,255,0.06)', mb: 2 }} />
+      <Divider sx={{ borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(24,22,15,0.08)', mb: 2 }} />
 
       <Typography
         variant="caption"
@@ -969,6 +992,8 @@ const TrainingSimulationRunner: React.FC<TrainingSimulationRunnerProps> = ({
   datasetName = '',
   trainingPlanSummary = '',
 }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const [isTraining, setIsTraining] = useState(false);
   const [logs, setLogs] = useState<TrainingLog[]>([]);
   const [result, setResult] = useState<CompletedResult | null>(null);
@@ -992,7 +1017,12 @@ const TrainingSimulationRunner: React.FC<TrainingSimulationRunnerProps> = ({
       const response = await fetch(`${API_URL}/api/training-sim/${sessionId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ task_type: taskType, model_id: topModelId, dataset_name: datasetName }),
+        body: JSON.stringify({
+          task_type: taskType,
+          model_id: topModelId,
+          dataset_name: datasetName,
+          training_plan: trainingPlanSummary,
+        }),
       });
 
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -1053,11 +1083,16 @@ const TrainingSimulationRunner: React.FC<TrainingSimulationRunnerProps> = ({
           mt: 3,
           p: 3,
           borderRadius: 2.5,
-          border: `1px solid rgba(194,181,232,0.22)`,
-          background: 'linear-gradient(135deg, rgba(31,35,44,0.85) 0%, rgba(23,26,34,0.88) 100%)',
+          border: isDark ? `1px solid rgba(194,181,232,0.22)` : '1px solid rgba(24,22,15,0.08)',
+          background: isDark
+            ? 'linear-gradient(135deg, rgba(31,35,44,0.85) 0%, rgba(23,26,34,0.88) 100%)'
+            : 'linear-gradient(135deg, #FFFFFF 0%, #FAF9F6 100%)',
+          backgroundColor: isDark ? 'rgba(23,26,34,0.88)' : '#FFFFFF',
           backdropFilter: 'blur(24px)',
           textAlign: 'center',
-          boxShadow: '0 1px 0 rgba(244,240,232,0.04) inset, 0 16px 40px rgba(0,0,0,0.32), 0 0 32px rgba(194,181,232,0.08)',
+          boxShadow: isDark
+            ? '0 1px 0 rgba(244,240,232,0.04) inset, 0 16px 40px rgba(0,0,0,0.32), 0 0 32px rgba(194,181,232,0.08)'
+            : '0 1px 0 rgba(255,255,255,0.96) inset, 0 12px 24px rgba(24,22,15,0.06)',
         }}
       >
         <Stack direction="row" spacing={1} justifyContent="center" alignItems="center" sx={{ mb: 1 }}>
@@ -1133,16 +1168,18 @@ const TrainingSimulationRunner: React.FC<TrainingSimulationRunnerProps> = ({
         sx={{
           fontFamily: '"JetBrains Mono","Fira Code","Cascadia Code",monospace',
           fontSize: '0.72rem',
-          background: clrNight,
-          border: '1px solid rgba(244,240,232,0.08)',
+          background: isDark ? clrNight : '#F1EEE7',
+          border: isDark ? '1px solid rgba(244,240,232,0.08)' : '1px solid rgba(24,22,15,0.10)',
           borderRadius: 2,
           p: 2,
           mb: result ? 3 : 0,
           maxHeight: 270,
           overflowY: 'auto',
-          boxShadow: '0 1px 0 rgba(244,240,232,0.04) inset, 0 8px 24px rgba(0,0,0,0.40)',
+          boxShadow: isDark
+            ? '0 1px 0 rgba(244,240,232,0.04) inset, 0 8px 24px rgba(0,0,0,0.40)'
+            : '0 1px 0 rgba(255,255,255,0.9) inset, 0 8px 22px rgba(24,22,15,0.08)',
           scrollbarWidth: 'thin',
-          scrollbarColor: `#272C37 ${clrNight}`,
+          scrollbarColor: isDark ? `#272C37 ${clrNight}` : '#D8D2C8 #F1EEE7',
         }}
       >
         {logs.map((log, i) => (
@@ -1155,7 +1192,7 @@ const TrainingSimulationRunner: React.FC<TrainingSimulationRunnerProps> = ({
             </Typography>
             <Typography
               component="span"
-              sx={{ color: '#76716A', fontSize: '0.65rem', fontFamily: 'inherit', flexShrink: 0, mt: '1px', userSelect: 'none' }}
+              sx={{ color: 'text.disabled', fontSize: '0.65rem', fontFamily: 'inherit', flexShrink: 0, mt: '1px', userSelect: 'none' }}
             >
               [{log.timestamp}]
             </Typography>
@@ -1166,7 +1203,7 @@ const TrainingSimulationRunner: React.FC<TrainingSimulationRunnerProps> = ({
                 fontSize: '0.72rem',
                 lineHeight: 1.55,
                 color:
-                  log.type === 'section' ? clrLilac : log.type === 'epoch' ? clrMint : '#B5AFA4',
+                  log.type === 'section' ? clrLilac : log.type === 'epoch' ? clrMint : isDark ? '#B5AFA4' : 'text.secondary',
                 fontWeight: log.type === 'section' ? 600 : 400,
               }}
             >
@@ -1184,7 +1221,7 @@ const TrainingSimulationRunner: React.FC<TrainingSimulationRunnerProps> = ({
             </Typography>
             <Typography
               component="span"
-              sx={{ color: '#76716A', fontSize: '0.65rem', fontFamily: 'inherit', userSelect: 'none' }}
+              sx={{ color: 'text.disabled', fontSize: '0.65rem', fontFamily: 'inherit', userSelect: 'none' }}
             >
               [{nowStamp()}]
             </Typography>
@@ -1212,10 +1249,14 @@ const TrainingSimulationRunner: React.FC<TrainingSimulationRunnerProps> = ({
               mb: 3,
               p: 2.25,
               borderRadius: 2,
-              background: `linear-gradient(180deg, rgba(194,181,232,0.08) 0%, rgba(31,35,44,0.85) 100%)`,
+              background: isDark
+                ? `linear-gradient(180deg, rgba(194,181,232,0.08) 0%, rgba(31,35,44,0.85) 100%)`
+                : `linear-gradient(180deg, rgba(194,181,232,0.14) 0%, rgba(255,255,255,0.96) 100%)`,
               backdropFilter: 'blur(20px)',
               border: `1px solid rgba(194,181,232,0.22)`,
-              boxShadow: '0 1px 0 rgba(244,240,232,0.04) inset, 0 12px 28px rgba(0,0,0,0.28)',
+              boxShadow: isDark
+                ? '0 1px 0 rgba(244,240,232,0.04) inset, 0 12px 28px rgba(0,0,0,0.28)'
+                : '0 1px 0 rgba(255,255,255,0.92) inset, 0 12px 26px rgba(24,22,15,0.08)',
             }}
           >
             <Typography
@@ -1274,10 +1315,14 @@ const TrainingSimulationRunner: React.FC<TrainingSimulationRunnerProps> = ({
             sx={{
               p: 2.25,
               borderRadius: 2,
-              background: `linear-gradient(180deg, rgba(168,212,197,0.10) 0%, rgba(31,35,44,0.85) 100%)`,
+              background: isDark
+                ? `linear-gradient(180deg, rgba(168,212,197,0.10) 0%, rgba(31,35,44,0.85) 100%)`
+                : `linear-gradient(180deg, rgba(168,212,197,0.16) 0%, rgba(255,255,255,0.96) 100%)`,
               backdropFilter: 'blur(20px)',
               border: `1px solid rgba(168,212,197,0.32)`,
-              boxShadow: '0 1px 0 rgba(244,240,232,0.04) inset, 0 12px 32px rgba(0,0,0,0.28), 0 0 32px rgba(168,212,197,0.12)',
+              boxShadow: isDark
+                ? '0 1px 0 rgba(244,240,232,0.04) inset, 0 12px 32px rgba(0,0,0,0.28), 0 0 32px rgba(168,212,197,0.12)'
+                : '0 1px 0 rgba(255,255,255,0.92) inset, 0 12px 28px rgba(24,22,15,0.08), 0 0 28px rgba(168,212,197,0.10)',
             }}
           >
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.6 }}>

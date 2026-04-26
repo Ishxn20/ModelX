@@ -13,6 +13,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -173,11 +174,11 @@ function ModelAvatar() {
   );
 }
 
-const mdSx = {
-  '& p': { m: 0, lineHeight: 1.7, color: '#F4F0E8' },
+const getMdSx = (isDark: boolean) => ({
+  '& p': { m: 0, lineHeight: 1.7, color: 'text.primary' },
   '& p + p': { mt: 1 },
   '& ul, & ol': { pl: 2.5, my: 0.5 },
-  '& li': { lineHeight: 1.65, color: '#F4F0E8' },
+  '& li': { lineHeight: 1.65, color: 'text.primary' },
   '& code': {
     background: 'rgba(212, 176, 122, 0.16)',
     border: '1px solid rgba(212, 176, 122, 0.20)',
@@ -189,27 +190,27 @@ const mdSx = {
     color: '#D4B07A',
   },
   '& pre': {
-    background: '#0A0B0F',
+    background: isDark ? '#0A0B0F' : '#F1EEE7',
     borderRadius: '8px',
     p: 1.5,
     overflowX: 'auto',
     my: 1,
-    border: '1px solid rgba(244, 240, 232, 0.08)',
-    '& code': { background: 'transparent', border: 'none', p: 0, color: '#B5AFA4' },
+    border: isDark ? '1px solid rgba(244, 240, 232, 0.08)' : '1px solid rgba(24, 22, 15, 0.10)',
+    '& code': { background: 'transparent', border: 'none', p: 0, color: 'text.secondary' },
   },
   '& table': { width: '100%', borderCollapse: 'collapse', my: 1 },
   '& th, & td': {
-    border: '1px solid rgba(244, 240, 232, 0.08)',
+    border: isDark ? '1px solid rgba(244, 240, 232, 0.08)' : '1px solid rgba(24, 22, 15, 0.10)',
     px: 1.5,
     py: 0.75,
     textAlign: 'left',
     fontSize: '0.82rem',
-    color: '#F4F0E8',
+    color: 'text.primary',
   },
   '& th': { background: 'rgba(194, 181, 232, 0.10)', fontWeight: 600, color: '#C2B5E8' },
-  '& strong': { color: '#F4F0E8', fontWeight: 600 },
+  '& strong': { color: 'text.primary', fontWeight: 600 },
   '& a': { color: '#C2B5E8', borderBottom: '1px solid rgba(194, 181, 232, 0.30)', textDecoration: 'none' },
-};
+});
 
 const InferenceChat: React.FC<InferenceChatProps> = ({
   taskType = 'binary_classification',
@@ -223,6 +224,8 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
   nextSteps,
   compatibility,
 }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [attachments, setAttachments] = useState<ChatImage[]>([]);
@@ -380,12 +383,16 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
       sx={{
         height: '100%',
         minHeight: 480,
-        background: 'linear-gradient(180deg, rgba(23, 26, 34, 0.85) 0%, rgba(16, 18, 24, 0.88) 100%)',
+        background: isDark
+          ? 'linear-gradient(180deg, rgba(23, 26, 34, 0.85) 0%, rgba(16, 18, 24, 0.88) 100%)'
+          : 'linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 245, 241, 0.98) 100%)',
         backdropFilter: 'blur(24px)',
         borderRadius: '14px',
-        border: '1px solid rgba(244, 240, 232, 0.08)',
+        border: isDark ? '1px solid rgba(244, 240, 232, 0.08)' : '1px solid rgba(24, 22, 15, 0.08)',
         overflow: 'hidden',
-        boxShadow: '0 1px 0 rgba(244, 240, 232, 0.04) inset, 0 16px 48px rgba(0, 0, 0, 0.36)',
+        boxShadow: isDark
+          ? '0 1px 0 rgba(244, 240, 232, 0.04) inset, 0 16px 48px rgba(0, 0, 0, 0.36)'
+          : '0 1px 0 rgba(255, 255, 255, 0.92) inset, 0 16px 40px rgba(24, 22, 15, 0.10)',
       }}
     >
       <Stack
@@ -395,8 +402,8 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
         sx={{
           px: 2.5,
           py: 1.5,
-          borderBottom: '1px solid rgba(244, 240, 232, 0.06)',
-          background: 'rgba(16, 18, 24, 0.6)',
+          borderBottom: isDark ? '1px solid rgba(244, 240, 232, 0.06)' : '1px solid rgba(24, 22, 15, 0.08)',
+          background: isDark ? 'rgba(16, 18, 24, 0.6)' : 'rgba(255, 255, 255, 0.76)',
           flexShrink: 0,
         }}
       >
@@ -406,7 +413,7 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
             sx={{
               fontSize: '0.88rem',
               fontWeight: 600,
-              color: '#F4F0E8',
+              color: 'text.primary',
               letterSpacing: '-0.01em',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -415,7 +422,7 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
           >
             {modelName}
           </Typography>
-          <Typography sx={{ fontSize: '0.72rem', color: '#76716A' }}>
+          <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary' }}>
             {taskLabel(taskType)}{datasetName ? ` · ${datasetName}` : ''}
           </Typography>
         </Box>
@@ -458,7 +465,7 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
           gap: 2,
           background: 'transparent',
           scrollbarWidth: 'thin',
-          scrollbarColor: '#272C37 transparent',
+          scrollbarColor: isDark ? '#272C37 transparent' : '#D8D2C8 transparent',
         }}
       >
         {messages.length === 0 ? (
@@ -473,16 +480,18 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 0 32px rgba(194, 181, 232, 0.20), 0 1px 0 rgba(244, 240, 232, 0.06) inset',
+                boxShadow: isDark
+                  ? '0 0 32px rgba(194, 181, 232, 0.20), 0 1px 0 rgba(244, 240, 232, 0.06) inset'
+                  : '0 0 28px rgba(157, 141, 208, 0.14), 0 1px 0 rgba(255, 255, 255, 0.9) inset',
               }}
             >
               <AutoAwesomeIcon sx={{ color: '#C2B5E8', fontSize: '1.7rem', filter: 'drop-shadow(0 0 12px rgba(194, 181, 232, 0.55))' }} />
             </Box>
             <Box sx={{ textAlign: 'center' }}>
-              <Typography sx={{ fontWeight: 600, color: '#F4F0E8', fontSize: '1.05rem', mb: 0.5, letterSpacing: '-0.015em' }}>
+              <Typography sx={{ fontWeight: 600, color: 'text.primary', fontSize: '1.05rem', mb: 0.5, letterSpacing: '-0.015em' }}>
                 Ready to run inference
               </Typography>
-              <Typography sx={{ fontSize: '0.82rem', color: '#B5AFA4', maxWidth: 340 }}>
+              <Typography sx={{ fontSize: '0.82rem', color: 'text.secondary', maxWidth: 340 }}>
                 Ask questions, upload files, or send examples to the model and receive live predictions.
               </Typography>
             </Box>
@@ -496,19 +505,21 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
                     px: 2,
                     py: 1.15,
                     borderRadius: '10px',
-                    border: '1px solid rgba(244, 240, 232, 0.08)',
-                    background: 'rgba(31, 35, 44, 0.6)',
+                    border: isDark ? '1px solid rgba(244, 240, 232, 0.08)' : '1px solid rgba(24, 22, 15, 0.08)',
+                    background: isDark ? 'rgba(31, 35, 44, 0.6)' : 'rgba(255, 255, 255, 0.78)',
                     cursor: 'pointer',
                     transition: 'all 300ms cubic-bezier(0.16, 1, 0.3, 1)',
                     '&:hover': {
                       background: 'rgba(194, 181, 232, 0.08)',
                       borderColor: 'rgba(194, 181, 232, 0.30)',
-                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(194, 181, 232, 0.10)',
+                      boxShadow: isDark
+                        ? '0 4px 16px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(194, 181, 232, 0.10)'
+                        : '0 4px 16px rgba(24, 22, 15, 0.08), 0 0 0 1px rgba(157, 141, 208, 0.10)',
                       transform: 'translateY(-1px)',
                     },
                   }}
                 >
-                  <Typography sx={{ fontSize: '0.8rem', color: '#F4F0E8' }}>
+                  <Typography sx={{ fontSize: '0.8rem', color: 'text.primary' }}>
                     {s}
                   </Typography>
                 </Box>
@@ -534,15 +545,17 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
                   background:
                     msg.role === 'user'
                       ? 'linear-gradient(135deg, #C2B5E8 0%, #9D8DD0 100%)'
-                      : 'rgba(31, 35, 44, 0.85)',
+                      : isDark ? 'rgba(31, 35, 44, 0.85)' : 'rgba(255, 255, 255, 0.94)',
                   border:
                     msg.role === 'user'
                       ? 'none'
-                      : '1px solid rgba(244, 240, 232, 0.06)',
+                      : isDark ? '1px solid rgba(244, 240, 232, 0.06)' : '1px solid rgba(24, 22, 15, 0.08)',
                   boxShadow:
                     msg.role === 'user'
                       ? '0 1px 0 rgba(255, 255, 255, 0.18) inset, 0 6px 18px rgba(157, 141, 208, 0.32)'
-                      : '0 1px 0 rgba(244, 240, 232, 0.03) inset, 0 4px 14px rgba(0, 0, 0, 0.24)',
+                      : isDark
+                        ? '0 1px 0 rgba(244, 240, 232, 0.03) inset, 0 4px 14px rgba(0, 0, 0, 0.24)'
+                        : '0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 4px 14px rgba(24, 22, 15, 0.08)',
                 }}
               >
                 {msg.images && msg.images.length > 0 && (
@@ -568,7 +581,7 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
                 {msg.streaming && !msg.content ? (
                   <TypingDots />
                 ) : msg.role === 'assistant' ? (
-                  <Box sx={{ ...mdSx, fontSize: '0.83rem' }}>
+                  <Box sx={{ ...getMdSx(isDark), fontSize: '0.83rem' }}>
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {msg.content}
                     </ReactMarkdown>
@@ -608,8 +621,8 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
       <Box
         sx={{
           flexShrink: 0,
-          borderTop: '1px solid rgba(244, 240, 232, 0.06)',
-          background: 'rgba(16, 18, 24, 0.6)',
+          borderTop: isDark ? '1px solid rgba(244, 240, 232, 0.06)' : '1px solid rgba(24, 22, 15, 0.08)',
+          background: isDark ? 'rgba(16, 18, 24, 0.6)' : 'rgba(255, 255, 255, 0.76)',
           px: 2.5,
           pt: 1.5,
           pb: 1.5,
@@ -641,13 +654,13 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
                     right: -6,
                     width: 18,
                     height: 18,
-                    bgcolor: '#0A0B0F',
-                    border: '1px solid rgba(244, 240, 232, 0.20)',
-                    '&:hover': { bgcolor: '#272C37' },
+                    bgcolor: isDark ? '#0A0B0F' : '#FFFFFF',
+                    border: isDark ? '1px solid rgba(244, 240, 232, 0.20)' : '1px solid rgba(24, 22, 15, 0.12)',
+                    '&:hover': { bgcolor: isDark ? '#272C37' : '#F1EEE7' },
                     p: 0,
                   }}
                 >
-                  <ClearIcon sx={{ fontSize: '0.65rem', color: '#F4F0E8' }} />
+                  <ClearIcon sx={{ fontSize: '0.65rem', color: 'text.primary' }} />
                 </IconButton>
               </Box>
             ))}
@@ -659,16 +672,16 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
           alignItems="flex-end"
           spacing={1}
           sx={{
-            background: 'rgba(31, 35, 44, 0.85)',
+            background: isDark ? 'rgba(31, 35, 44, 0.85)' : 'rgba(255, 255, 255, 0.92)',
             borderRadius: '14px',
-            border: '1px solid rgba(244, 240, 232, 0.08)',
+            border: isDark ? '1px solid rgba(244, 240, 232, 0.08)' : '1px solid rgba(24, 22, 15, 0.10)',
             px: 1.5,
             py: 1,
             transition: 'all 250ms cubic-bezier(0.16, 1, 0.3, 1)',
             '&:focus-within': {
               borderColor: 'rgba(194, 181, 232, 0.45)',
               boxShadow: '0 0 0 3px rgba(194, 181, 232, 0.10)',
-              background: 'rgba(39, 44, 55, 0.85)',
+              background: isDark ? 'rgba(39, 44, 55, 0.85)' : 'rgba(255, 255, 255, 1)',
             },
           }}
         >
@@ -708,13 +721,13 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
               border: 'none',
               outline: 'none',
               resize: 'none',
-              color: '#F4F0E8',
+              color: 'text.primary',
               fontSize: '0.86rem',
               lineHeight: 1.6,
               fontFamily: 'inherit',
               py: 0.5,
               overflowY: 'auto',
-              '&::placeholder': { color: '#76716A' },
+              '&::placeholder': { color: 'text.disabled' },
             }}
           />
 
@@ -728,7 +741,7 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
               borderRadius: '10px',
               background:
                 streaming || (!input.trim() && attachments.length === 0)
-                  ? 'rgba(244, 240, 232, 0.06)'
+                  ? isDark ? 'rgba(244, 240, 232, 0.06)' : 'rgba(24, 22, 15, 0.06)'
                   : 'linear-gradient(135deg, #C2B5E8 0%, #9D8DD0 100%)',
               boxShadow:
                 streaming || (!input.trim() && attachments.length === 0)
@@ -752,7 +765,7 @@ const InferenceChat: React.FC<InferenceChatProps> = ({
           </IconButton>
         </Stack>
 
-        <Typography sx={{ fontSize: '0.62rem', color: '#76716A', textAlign: 'center', mt: 0.75, letterSpacing: '0.02em' }}>
+        <Typography sx={{ fontSize: '0.62rem', color: 'text.disabled', textAlign: 'center', mt: 0.75, letterSpacing: '0.02em' }}>
           Shift + Enter for new line · Enter to send
         </Typography>
       </Box>

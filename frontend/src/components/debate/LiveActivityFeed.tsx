@@ -5,30 +5,24 @@ import {
   Stack,
   Avatar,
   Chip,
-  TextField,
-  InputAdornment,
   IconButton,
   Modal,
   Fade,
   Backdrop,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { keyframes } from '@mui/system';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { AgentMessage, Agent } from '../../lib/types';
 import { preprocessMarkdown } from '../../lib/markdownUtils';
-import SearchIcon from '@mui/icons-material/Search';
-import ClearIcon from '@mui/icons-material/Clear';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 
-const clrText = '#F4F0E8';
-const clrMuted = '#B5AFA4';
 const clrSoft = '#76716A';
 const clrNight = '#0A0B0F';
 const clrLilac = '#C2B5E8';
-const clrLilacDeep = '#9D8DD0';
 const clrMint = '#A8D4C5';
 const clrAmber = '#D4B07A';
 
@@ -64,7 +58,8 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
   agents,
   activeAgents,
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [fullscreen, setFullscreen] = useState(false);
   const feedRef = useRef<HTMLDivElement>(null);
@@ -93,15 +88,9 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
   };
 
   const filteredMessages = messages.filter(message => {
-    const agent = getAgent(message.agent);
-    const agentName = agent?.name || message.agent;
-    const matchesSearch = searchQuery === '' ||
-      message.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      agentName.toLowerCase().includes(searchQuery.toLowerCase());
-
     const matchesAgent = selectedAgent === null || message.agent === selectedAgent;
 
-    return matchesSearch && matchesAgent;
+    return matchesAgent;
   });
 
   const AGENT_PHASE_LABEL: Record<string, string> = {
@@ -136,49 +125,16 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
         sx={{
           width: 260,
           flexShrink: 0,
-          borderRight: '1px solid rgba(244,240,232,0.06)',
-          background: 'rgba(16,18,24,0.6)',
+          borderRight: isDark ? '1px solid rgba(244,240,232,0.06)' : '1px solid rgba(24,22,15,0.08)',
+          background: isDark ? 'rgba(16,18,24,0.6)' : 'rgba(255,255,255,0.72)',
           backdropFilter: 'blur(20px)',
           display: 'flex',
           flexDirection: 'column',
           overflowY: 'auto',
         }}
       >
-        <Box sx={{ p: 1 }}>
-          <TextField
-            size="small"
-            fullWidth
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ fontSize: 18, color: clrSoft }} />
-                </InputAdornment>
-              ),
-              endAdornment: searchQuery && (
-                <InputAdornment position="end">
-                  <IconButton size="small" onClick={() => setSearchQuery('')}>
-                    <ClearIcon sx={{ fontSize: 16, color: clrSoft }} />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-            sx={{
-              mb: 1.5,
-              '& .MuiOutlinedInput-root': {
-                background: 'rgba(31,35,44,0.85)',
-                height: 36,
-                fontSize: '0.875rem',
-                color: clrText,
-                '& fieldset': { borderColor: 'rgba(244,240,232,0.08)' },
-                '&:hover fieldset': { borderColor: 'rgba(244,240,232,0.14)' },
-              },
-            }}
-          />
-
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1 }}>
+        <Box sx={{ p: 1.25 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.25 }}>
             <FilterListIcon sx={{ fontSize: 16, color: clrSoft }} />
             <Typography variant="caption" sx={{ fontWeight: 600, color: clrSoft, textTransform: 'uppercase', letterSpacing: '0.10em', fontSize: '0.7rem' }}>
               Agents
@@ -198,22 +154,22 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
                 borderRadius: 1.5,
                 background: selectedAgent === null
                   ? 'linear-gradient(135deg, #C2B5E8 0%, #9D8DD0 100%)'
-                  : 'rgba(31,35,44,0.85)',
-                color: selectedAgent === null ? clrNight : clrMuted,
+                  : isDark ? 'rgba(31,35,44,0.85)' : 'rgba(255,255,255,0.82)',
+                color: selectedAgent === null ? clrNight : 'text.secondary',
                 fontWeight: selectedAgent === null ? 600 : 500,
                 fontSize: '0.875rem',
                 cursor: 'pointer',
                 transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
-                border: selectedAgent === null ? 'none' : '1px solid rgba(244,240,232,0.06)',
+                border: selectedAgent === null ? 'none' : isDark ? '1px solid rgba(244,240,232,0.06)' : '1px solid rgba(24,22,15,0.08)',
                 boxShadow: selectedAgent === null
                   ? '0 1px 0 rgba(255,255,255,0.18) inset, 0 6px 16px rgba(157,141,208,0.40)'
                   : 'none',
                 '&:hover': {
                   background: selectedAgent === null
                     ? 'linear-gradient(135deg, #D5CBEF 0%, #C2B5E8 100%)'
-                    : 'rgba(31,35,44,1)',
+                    : isDark ? 'rgba(31,35,44,1)' : 'rgba(255,255,255,1)',
                   transform: 'translateX(2px)',
-                  borderColor: selectedAgent === null ? 'transparent' : 'rgba(244,240,232,0.10)',
+                  borderColor: selectedAgent === null ? 'transparent' : isDark ? 'rgba(244,240,232,0.10)' : 'rgba(24,22,15,0.12)',
                 },
               }}
             >
@@ -245,8 +201,8 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
                   borderRadius: 1.5,
                   background: selectedAgent === agent.id
                     ? `linear-gradient(135deg, ${agent.color}E6 0%, ${agent.color}B3 100%)`
-                    : 'rgba(31,35,44,0.6)',
-                  color: selectedAgent === agent.id ? clrNight : clrMuted,
+                    : isDark ? 'rgba(31,35,44,0.6)' : 'rgba(255,255,255,0.78)',
+                  color: selectedAgent === agent.id ? clrNight : 'text.secondary',
                   fontWeight: selectedAgent === agent.id ? 600 : 500,
                   fontSize: '0.875rem',
                   cursor: 'pointer',
@@ -312,15 +268,15 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
         <Box
           sx={{
             p: 2,
-            borderBottom: '1px solid rgba(244,240,232,0.06)',
-            background: 'rgba(16,18,24,0.6)',
+            borderBottom: isDark ? '1px solid rgba(244,240,232,0.06)' : '1px solid rgba(24,22,15,0.08)',
+            background: isDark ? 'rgba(16,18,24,0.6)' : 'rgba(255,255,255,0.78)',
             backdropFilter: 'blur(20px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
           }}
         >
-          <Typography variant="h6" sx={{ fontWeight: 600, color: clrText, letterSpacing: '-0.01em' }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary', letterSpacing: '-0.01em' }}>
             Live Activity Feed
           </Typography>
           <IconButton
@@ -407,7 +363,7 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
                     animation: `${slideIn} 0.6s cubic-bezier(0.16, 1, 0.3, 1)`,
                     '&:hover': {
                       '& .message-card': {
-                        background: 'rgba(31,35,44,1)',
+                        background: isDark ? 'rgba(31,35,44,1)' : 'rgba(255,255,255,1)',
                         borderColor: `${agent.color}55`,
                       },
                     },
@@ -422,7 +378,9 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
                         color: clrNight,
                         fontWeight: 700,
                         fontSize: '0.875rem',
-                        border: isActive ? `2px solid ${agent.color}` : '1px solid rgba(244,240,232,0.08)',
+                        border: isActive
+                          ? `2px solid ${agent.color}`
+                          : isDark ? '1px solid rgba(244,240,232,0.08)' : '1px solid rgba(24,22,15,0.10)',
                         boxShadow: isActive ? `0 0 20px ${agent.color}55` : 'none',
                         animation: isActive ? `${pulse} 2s cubic-bezier(0.16, 1, 0.3, 1) infinite` : 'none',
                       }}
@@ -439,7 +397,7 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
                           height: 12,
                           borderRadius: '50%',
                           background: clrMint,
-                          border: '2px solid #171A22',
+                          border: isDark ? '2px solid #171A22' : '2px solid #FFFFFF',
                           boxShadow: '0 0 12px rgba(168,212,197,0.55)',
                         }}
                       />
@@ -452,10 +410,12 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
                       sx={{
                         p: 2,
                         borderRadius: 2,
-                        background: 'rgba(31,35,44,0.85)',
-                        border: '1px solid rgba(244,240,232,0.06)',
+                        background: isDark ? 'rgba(31,35,44,0.85)' : 'rgba(255,255,255,0.94)',
+                        border: isDark ? '1px solid rgba(244,240,232,0.06)' : '1px solid rgba(24,22,15,0.08)',
                         borderLeft: `3px solid ${agent.color}`,
-                        boxShadow: '0 1px 0 rgba(244,240,232,0.04) inset, 0 6px 18px rgba(0,0,0,0.24)',
+                        boxShadow: isDark
+                          ? '0 1px 0 rgba(244,240,232,0.04) inset, 0 6px 18px rgba(0,0,0,0.24)'
+                          : '0 1px 0 rgba(255,255,255,0.92) inset, 0 6px 18px rgba(24,22,15,0.08)',
                         transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                       }}
                     >
@@ -516,13 +476,13 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
                             border: '1px solid rgba(212,176,122,0.20)',
                           },
                           '& pre': {
-                            backgroundColor: clrNight,
-                            color: clrText,
+                            backgroundColor: isDark ? clrNight : '#F1EEE7',
+                            color: 'text.primary',
                             padding: '1rem',
                             borderRadius: 1,
                             overflow: 'auto',
                             margin: '0.5rem 0',
-                            border: '1px solid rgba(244,240,232,0.08)',
+                            border: isDark ? '1px solid rgba(244,240,232,0.08)' : '1px solid rgba(24,22,15,0.10)',
                             fontFamily: '"JetBrains Mono", monospace',
                           },
                           '& h1, & h2, & h3, & h4, & h5, & h6': {
@@ -555,7 +515,7 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
                             minWidth: '100%',
                           },
                           '& th, & td': {
-                            border: '1px solid rgba(244,240,232,0.08)',
+                            border: isDark ? '1px solid rgba(244,240,232,0.08)' : '1px solid rgba(24,22,15,0.10)',
                             padding: '0.5rem',
                             textAlign: 'left',
                             whiteSpace: 'normal',
@@ -586,8 +546,8 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
             }}
           >
             <Typography variant="body1" color="text.secondary">
-              {searchQuery || selectedAgent
-                ? 'No messages match your filters'
+              {selectedAgent
+                ? 'No messages match your filter'
                 : 'Waiting for agents to start planning...'}
             </Typography>
           </Box>
@@ -638,9 +598,12 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
       closeAfterTransition
       slots={{ backdrop: Backdrop }}
       slotProps={{
-        backdrop: {
+              backdrop: {
           timeout: 700,
-          sx: { backgroundColor: 'rgba(10,11,15,0.72)', backdropFilter: 'blur(8px)' },
+          sx: {
+            backgroundColor: isDark ? 'rgba(10,11,15,0.72)' : 'rgba(246,245,241,0.72)',
+            backdropFilter: 'blur(8px)',
+          },
         },
       }}
     >
@@ -654,7 +617,7 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
             bottom: 0,
             display: 'flex',
             flexDirection: 'column',
-            bgcolor: '#0F1116',
+            bgcolor: isDark ? '#0F1116' : '#F6F5F1',
             backdropFilter: 'blur(20px)',
             overflow: 'hidden',
           }}
@@ -662,8 +625,8 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
           <Box
             sx={{
               p: 3,
-              borderBottom: '1px solid rgba(244,240,232,0.06)',
-              background: 'rgba(16,18,24,0.6)',
+              borderBottom: isDark ? '1px solid rgba(244,240,232,0.06)' : '1px solid rgba(24,22,15,0.08)',
+              background: isDark ? 'rgba(16,18,24,0.6)' : 'rgba(255,255,255,0.78)',
               backdropFilter: 'blur(20px)',
               display: 'flex',
               alignItems: 'center',
@@ -671,7 +634,7 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
             }}
           >
             <Box>
-              <Typography variant="h4" sx={{ fontWeight: 600, mb: 0.5, color: clrText, letterSpacing: '-0.02em' }}>
+              <Typography variant="h4" sx={{ fontWeight: 600, mb: 0.5, color: 'text.primary', letterSpacing: '-0.02em' }}>
                 Live Activity Feed
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -705,42 +668,6 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
               width: '100%',
             }}
           >
-            <Box sx={{ mb: 4 }}>
-              <TextField
-                size="medium"
-                fullWidth
-                placeholder="Search messages..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                  endAdornment: searchQuery && (
-                    <InputAdornment position="end">
-                      <IconButton size="small" onClick={() => setSearchQuery('')}>
-                        <ClearIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    background: 'rgba(31,35,44,0.85)',
-                    color: clrText,
-                    transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
-                    '& fieldset': { borderColor: 'rgba(244,240,232,0.08)' },
-                    '&:hover': {
-                      background: 'rgba(31,35,44,1)',
-                    },
-                    '&:hover fieldset': { borderColor: 'rgba(244,240,232,0.14)' },
-                  },
-                }}
-              />
-            </Box>
-
             {filteredMessages.length === 0 ? (
               <Box
                 sx={{
@@ -750,13 +677,13 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
                 }}
               >
                 <Typography variant="h5" sx={{ mb: 2, color: 'text.secondary' }}>
-                  {searchQuery || selectedAgent
-                    ? 'No messages match your filters'
+                  {selectedAgent
+                    ? 'No messages match your filter'
                     : 'No messages yet'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {searchQuery || selectedAgent
-                    ? 'Try adjusting your search or filter settings'
+                  {selectedAgent
+                    ? 'Try selecting a different agent'
                     : 'Messages will appear here as agents start planning'}
                 </Typography>
               </Box>
@@ -775,11 +702,13 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
                       animation: `${slideIn} 0.6s cubic-bezier(0.16, 1, 0.3, 1)`,
                       p: 3,
                       borderRadius: 2,
-                      background: 'rgba(31,35,44,0.85)',
-                      border: '1px solid rgba(244,240,232,0.06)',
-                      boxShadow: '0 1px 0 rgba(244,240,232,0.04) inset, 0 8px 24px rgba(0,0,0,0.28)',
+                      background: isDark ? 'rgba(31,35,44,0.85)' : 'rgba(255,255,255,0.94)',
+                      border: isDark ? '1px solid rgba(244,240,232,0.06)' : '1px solid rgba(24,22,15,0.08)',
+                      boxShadow: isDark
+                        ? '0 1px 0 rgba(244,240,232,0.04) inset, 0 8px 24px rgba(0,0,0,0.28)'
+                        : '0 1px 0 rgba(255,255,255,0.92) inset, 0 8px 24px rgba(24,22,15,0.08)',
                       '&:hover': {
-                        background: 'rgba(31,35,44,1)',
+                        background: isDark ? 'rgba(31,35,44,1)' : 'rgba(255,255,255,1)',
                         borderColor: `${agent.color}55`,
                         transform: 'translateY(-1px)',
                       },
@@ -840,13 +769,13 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
                           border: '1px solid rgba(212,176,122,0.20)',
                         },
                         '& pre': {
-                          background: clrNight,
-                          color: clrText,
+                          background: isDark ? clrNight : '#F1EEE7',
+                          color: 'text.primary',
                           padding: 2,
                           borderRadius: 1,
                           overflow: 'auto',
                           mb: 1.5,
-                          border: '1px solid rgba(244,240,232,0.08)',
+                          border: isDark ? '1px solid rgba(244,240,232,0.08)' : '1px solid rgba(24,22,15,0.10)',
                           fontFamily: '"JetBrains Mono", monospace',
                         },
                         '& table': {
@@ -858,7 +787,7 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
                           minWidth: '100%',
                         },
                         '& th, & td': {
-                          border: '1px solid rgba(244,240,232,0.08)',
+                          border: isDark ? '1px solid rgba(244,240,232,0.08)' : '1px solid rgba(24,22,15,0.10)',
                           padding: '0.75rem',
                           textAlign: 'left',
                           whiteSpace: 'normal',
@@ -870,11 +799,11 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
                           color: clrLilac,
                         },
                         '& td': {
-                          background: 'rgba(23,26,34,0.6)',
-                          color: clrText,
+                          background: isDark ? 'rgba(23,26,34,0.6)' : 'rgba(255,255,255,0.68)',
+                          color: 'text.primary',
                         },
                         '& tr:hover td': {
-                          background: 'rgba(31,35,44,0.85)',
+                          background: isDark ? 'rgba(31,35,44,0.85)' : 'rgba(246,245,241,0.92)',
                         },
                         '& blockquote': {
                           borderLeft: `4px solid ${agent.color}`,

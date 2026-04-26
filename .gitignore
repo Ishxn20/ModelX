@@ -1,6 +1,9 @@
 .env
 backend/.env
 frontend/.env
-__pycache__/
+.DS_Store
+backend/.venv/
+.venv/
+**/__pycache__/
 *.py[cod]
 backend/private_keys.json

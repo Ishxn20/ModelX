@@ -8,6 +8,7 @@ load_dotenv()
 class Settings(BaseSettings):
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
+    google_api_key: Optional[str] = None
     llm_provider: str = "openai"
     llm_model: str = "gpt-4-turbo-preview"
     model: Optional[str] = None
@@ -16,8 +17,6 @@ class Settings(BaseSettings):
 
     backend_host: str = "0.0.0.0"
     backend_port: int = 8000
-
-    mock_mode: bool = False
 
     cors_origins: list[str] = [
         "http://localhost:5173",

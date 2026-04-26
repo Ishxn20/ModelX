@@ -1,6 +1,6 @@
 from fastapi import Request
 from fastapi.responses import StreamingResponse
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 import json
 import asyncio
 import logging
