@@ -1,0 +1,128 @@
+<svg width="1600" height="520" viewBox="0 0 1600 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">ModelX Linear Agent Flow</title>
+  <desc id="desc">A linear workflow showing ModelX moving from an idea through intake, dataset, model, training, evaluation, guide, and blueprint stages.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="520" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#07111f"/>
+      <stop offset="0.55" stop-color="#102044"/>
+      <stop offset="1" stop-color="#06241f"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="560" y1="62" x2="1040" y2="62" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60a5fa"/>
+      <stop offset="0.5" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#34d399"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="guide" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#dcfce7"/>
+      <stop offset="1" stop-color="#bbf7d0"/>
+    </linearGradient>
+    <linearGradient id="blueprint" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fef3c7"/>
+      <stop offset="1" stop-color="#fed7aa"/>
+    </linearGradient>
+    <filter id="shadow" x="-18%" y="-28%" width="136%" height="170%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#000000" flood-opacity="0.32"/>
+    </filter>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="16" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <marker id="arrow" markerWidth="16" markerHeight="16" refX="13" refY="8" orient="auto" markerUnits="strokeWidth">
+      <path d="M2 2L14 8L2 14V2Z" fill="#93c5fd"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="520" rx="34" fill="url(#bg)"/>
+  <circle cx="176" cy="88" r="190" fill="#3b82f6" opacity="0.14" filter="url(#glow)"/>
+  <circle cx="1400" cy="430" r="220" fill="#10b981" opacity="0.14" filter="url(#glow)"/>
+
+  <text x="800" y="74" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="850" fill="url(#brand)">ModelX Agent Flow</text>
+  <text x="800" y="112" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="20" fill="#cbd5e1">Idea to ML Blueprint</text>
+
+  <path d="M176 276H1414" stroke="#334155" stroke-width="10" stroke-linecap="round"/>
+  <path d="M176 276H1414" stroke="#93c5fd" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 172" opacity="0.9"/>
+
+  <g filter="url(#shadow)" font-family="Inter, Arial, sans-serif">
+    <g>
+      <rect x="56" y="188" width="148" height="176" rx="20" fill="url(#card)" stroke="#60a5fa" stroke-width="3"/>
+      <circle cx="130" cy="236" r="22" fill="#2563eb"/>
+      <text x="130" y="244" text-anchor="middle" font-size="22" font-weight="850" fill="#eff6ff">1</text>
+      <text x="130" y="298" text-anchor="middle" font-size="22" font-weight="850" fill="#0f172a">Idea</text>
+    </g>
+
+    <g>
+      <rect x="250" y="188" width="148" height="176" rx="20" fill="url(#card)" stroke="#818cf8" stroke-width="3"/>
+      <circle cx="324" cy="236" r="22" fill="#4f46e5"/>
+      <text x="324" y="244" text-anchor="middle" font-size="22" font-weight="850" fill="#eef2ff">2</text>
+      <text x="324" y="298" text-anchor="middle" font-size="22" font-weight="850" fill="#0f172a">Intake</text>
+    </g>
+
+    <g>
+      <rect x="444" y="188" width="148" height="176" rx="20" fill="url(#card)" stroke="#06b6d4" stroke-width="3"/>
+      <circle cx="518" cy="236" r="22" fill="#0891b2"/>
+      <text x="518" y="244" text-anchor="middle" font-size="22" font-weight="850" fill="#ecfeff">3</text>
+      <text x="518" y="292" text-anchor="middle" font-size="21" font-weight="850" fill="#0f172a">Dataset</text>
+      <text x="518" y="322" text-anchor="middle" font-size="15" font-weight="650" fill="#475569">Agent</text>
+    </g>
+
+    <g>
+      <rect x="638" y="188" width="148" height="176" rx="20" fill="url(#card)" stroke="#06b6d4" stroke-width="3"/>
+      <circle cx="712" cy="236" r="22" fill="#0891b2"/>
+      <text x="712" y="244" text-anchor="middle" font-size="22" font-weight="850" fill="#ecfeff">4</text>
+      <text x="712" y="292" text-anchor="middle" font-size="21" font-weight="850" fill="#0f172a">Model</text>
+      <text x="712" y="322" text-anchor="middle" font-size="15" font-weight="650" fill="#475569">Agent</text>
+    </g>
+
+    <g>
+      <rect x="832" y="188" width="148" height="176" rx="20" fill="url(#card)" stroke="#06b6d4" stroke-width="3"/>
+      <circle cx="906" cy="236" r="22" fill="#0891b2"/>
+      <text x="906" y="244" text-anchor="middle" font-size="22" font-weight="850" fill="#ecfeff">5</text>
+      <text x="906" y="292" text-anchor="middle" font-size="21" font-weight="850" fill="#0f172a">Training</text>
+      <text x="906" y="322" text-anchor="middle" font-size="15" font-weight="650" fill="#475569">Agent</text>
+    </g>
+
+    <g>
+      <rect x="1026" y="188" width="148" height="176" rx="20" fill="url(#card)" stroke="#06b6d4" stroke-width="3"/>
+      <circle cx="1100" cy="236" r="22" fill="#0891b2"/>
+      <text x="1100" y="244" text-anchor="middle" font-size="22" font-weight="850" fill="#ecfeff">6</text>
+      <text x="1100" y="292" text-anchor="middle" font-size="20" font-weight="850" fill="#0f172a">Evaluation</text>
+      <text x="1100" y="322" text-anchor="middle" font-size="15" font-weight="650" fill="#475569">Agent</text>
+    </g>
+
+    <g>
+      <rect x="1220" y="188" width="148" height="176" rx="20" fill="url(#guide)" stroke="#10b981" stroke-width="3"/>
+      <circle cx="1294" cy="236" r="22" fill="#059669"/>
+      <text x="1294" y="244" text-anchor="middle" font-size="22" font-weight="850" fill="#ecfdf5">7</text>
+      <text x="1294" y="292" text-anchor="middle" font-size="21" font-weight="850" fill="#052e16">Guide</text>
+    </g>
+
+    <g>
+      <rect x="1414" y="188" width="148" height="176" rx="20" fill="url(#blueprint)" stroke="#f59e0b" stroke-width="3"/>
+      <circle cx="1488" cy="236" r="22" fill="#d97706"/>
+      <text x="1488" y="244" text-anchor="middle" font-size="22" font-weight="850" fill="#fffbeb">8</text>
+      <text x="1488" y="292" text-anchor="middle" font-size="20" font-weight="900" fill="#451a03">ML</text>
+      <text x="1488" y="322" text-anchor="middle" font-size="20" font-weight="900" fill="#451a03">Blueprint</text>
+    </g>
+  </g>
+
+  <g stroke="#93c5fd" stroke-width="6" stroke-linecap="round" marker-end="url(#arrow)">
+    <path d="M204 276H248"/>
+    <path d="M398 276H442"/>
+    <path d="M592 276H636"/>
+    <path d="M786 276H830"/>
+    <path d="M980 276H1024"/>
+    <path d="M1174 276H1218"/>
+    <path d="M1368 276H1412"/>
+  </g>
+
+  <rect x="512" y="412" width="576" height="48" rx="24" fill="#0f172a" opacity="0.72" stroke="#334155"/>
+  <text x="800" y="443" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="750" fill="#e2e8f0">Specialist debate becomes one beginner-friendly plan.</text>
+</svg>
